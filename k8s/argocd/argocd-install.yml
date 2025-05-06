@@ -1,0 +1,24 @@
+# Official Argo CD installation (kept minimal; will pull in all components)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: install-argocd
+  namespace: argocd
+spec:
+  template:
+    spec:
+      containers:
+      - name: argocd-install
+        image: argoproj/argo-cd:v2.11.0
+        command:
+          - /bin/sh
+          - -c
+          - |
+            kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.11.0/manifests/install.yaml
+        imagePullPolicy: IfNotPresent
+      restartPolicy: OnFailure

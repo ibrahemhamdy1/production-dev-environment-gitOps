@@ -1,0 +1,13 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.crash
+logs/
+
+# Kubernetes client
+kubeconfig
+
+# Editors
+.vscode/
+.idea/
