@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/<YOUR_GITHUB_USERNAME>/dev_env_k8s_repo.git
+    repoURL: https://github.com/YOUR_USERNAME/dev_env_k8s_repo.git
     targetRevision: HEAD
-    path: k8s
+    path: k8s/apps
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
