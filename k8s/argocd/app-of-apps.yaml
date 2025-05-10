@@ -10,7 +10,7 @@ spec:
   project: default
   source:
     path: k8s/apps
-    repoURL: https://github.com/your-org/your-repo.git
+    repoURL: https://github.com/ibrahemhamdy1/production-dev-environment-gitOps
     targetRevision: HEAD
   syncPolicy:
     automated:
