@@ -2,8 +2,14 @@
 terraform {
   required_version = ">= 1.4.0"
   required_providers {
-    kubernetes = { source = "hashicorp/kubernetes", version = "~> 2.27" }
-    helm       = { source = "hashicorp/helm",       version = "~> 2.13" }
+    helm = {
+      source  = "hashicorp/helm"
+      version = ">= 2.18.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.27.0"
+    }
   }
 }
 
@@ -64,7 +70,7 @@ resource "helm_release" "kps" {
   values     = [file("${path.module}/values/kps-values.yaml")]
 }
 
-data "kubernetes_secret" "argopwd" {
+data "kubernetes_secret" "argocd_pwd" {
   metadata {
     name      = "argocd-initial-admin-secret"
     namespace = kubernetes_namespace.argocd.metadata[0].name
@@ -72,6 +78,6 @@ data "kubernetes_secret" "argopwd" {
 }
 
 output "argocd_admin_password" {
-  value       = base64decode(data.kubernetes_secret.argopwd.data["password"])
+  value       = base64decode(data.kubernetes_secret.argocd_pwd.data["password"])
   sensitive   = true
 }
