@@ -1,31 +1,43 @@
-# Whitehelment Dev Environment — **Complete Folder**
+# DevEnv – Professional GitOps Platform (Cluster‑agnostic)
 
-This repository satisfies the take‑home task requirements.
+This repository bootstraps a **production‑grade GitOps stack** onto *any* Kubernetes cluster
+that is reachable via your `~/.kube/config`.
 
-## Quick start
+| Component | Version (default) |
+|-----------|-------------------|
+| Argo CD   | 6.7.8 (Helm)      |
+| Ingress   | nginx‑ingress 4.10.0 |
+| Metrics   | kube‑prometheus‑stack 57.1.1 |
 
-```bash
-# For microk8s users:
-export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
-
-./setup.sh        # wraps Terraform init+apply
-```
-
-When finished, forward ports:
+## Quick start (local)
 
 ```bash
-kubectl -n argocd port-forward svc/argocd-server 8080:443 &
-kubectl -n monitoring port-forward svc/kube-prometheus-stack-grafana 3000:80 &
+# 1️⃣ Create a local cluster with kind
+make kind
+
+# 2️⃣ Bootstrap Argo CD + monitoring stack via Terraform & Helm
+make bootstrap
 ```
 
-Argo CD → `https://localhost:8080`  
-Grafana → `http://localhost:3000`
+## Folder layout
 
----
+```
+terraform/          # Helm releases + providers (kubeconfig)
+kustomize/          # app manifests
+scripts/            # helper scripts
+Makefile            # convenience targets
+```
 
-## Repo layout
+## Requirements
 
-* `setup.sh` – smart installer (auto‑installs Helm, runs Terraform)  
-* `terraform/` – namespaces + Helm releases (Argo CD, Ingress, Prometheus)  
-* `k8s/` – optional GitOps layer (App‑of‑Apps)  
-* `docs/FILE_OVERVIEW.md` – file‑by‑file guide
+* Terraform ≥ 1.5
+* kubectl ≥ 1.29
+* Helm ≥ 3.13
+* kind (optional for local clusters)
+
+## Tear down
+
+```bash
+make destroy    # Removes helm releases
+make kind-clean # Deletes the kind cluster
+```

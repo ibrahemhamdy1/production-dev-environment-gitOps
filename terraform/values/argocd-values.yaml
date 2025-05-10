@@ -1,1 +1,3 @@
-# Argo CD values
+server:
+  service:
+    type: ClusterIP
