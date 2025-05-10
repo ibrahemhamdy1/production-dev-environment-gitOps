@@ -8,18 +8,11 @@ spec:
   source:
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-prometheus-stack
-    targetRevision: 60.0.1
+    targetRevision: 58.2.2
     helm:
-      values: |
-        grafana:
-          enabled: true
-        prometheus:
-          prometheusSpec:
-            retention: 15d
+      releaseName: kube-prometheus-stack
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+    automated: {}

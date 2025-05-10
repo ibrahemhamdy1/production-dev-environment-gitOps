@@ -1,25 +1,17 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
-echo "🚀 Initialising Terraform..."
-terraform -chdir=terraform init
-terraform -chdir=terraform apply -auto-approve
+echo "👉 Creating namespaces"
+kubectl apply -f k8s/base/01-namespaces.yaml
 
-echo "✅ Namespaces created."
+echo "👉 Installing Argo CD"
+kubectl apply -n argocd -f k8s/argocd/argocd-install.yaml
 
-echo "⎈ Installing Argo CD..."
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+echo "⏳ Waiting for Argo CD server"
+kubectl -n argocd rollout status deploy/argocd-server --timeout=3m
 
-echo "⏳ Waiting for Argo CD to be ready..."
-kubectl -n argocd wait --for=condition=Available deploy/argocd-server --timeout=180s
-
-echo "🌐 Patching Argo CD service to NodePort..."
-kubectl -n argocd patch svc argocd-server -p '{"spec": {"type": "NodePort"}}'
-
-echo "📦 Applying App of Apps config..."
+echo "👉 Bootstrapping App‑of‑Apps"
 kubectl apply -f k8s/argocd/app-of-apps.yaml
 
-echo "🔐 Getting Argo CD login info..."
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
-
-echo "🎉 Setup complete! Argo CD is accessible on your EC2 public IP with NodePort."
+echo "✅ Done. Forward Argo CD:"
+echo "kubectl -n argocd port-forward svc/argocd-server 8080:443"

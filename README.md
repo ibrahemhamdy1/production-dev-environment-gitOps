@@ -1,72 +1,54 @@
-# Argo CD Kubernetes Environment (NodePort Enabled)
+# Whitehelment – Kubernetes Dev Environment
 
-This repo sets up a GitOps-based Kubernetes environment using:
+This repo bootstraps a **fully‑featured development cluster** with:
 
-- ✅ Namespaces via Terraform
-- ✅ Argo CD via official manifests
-- ✅ Helm-based Applications (NGINX Ingress + kube-prometheus-stack)
-- ✅ NodePort-based access to Argo CD UI
+* **Argo CD** – GitOps (App‑of‑Apps)
+* **Ingress NGINX** controller
+* **Kube‑Prometheus‑Stack** (Prometheus + Grafana + Alertmanager)
+* **Terraform + Helm** for repeatable IaC
 
-## 🚀 Getting Started
-
-1. **Download and run the setup script:**
-
-```bash
-chmod +x setup_with_nodeport.sh
-./setup_with_nodeport.sh
-```
-
-2. **Expose Argo CD via NodePort (automatically handled)**
-
-After setup, Argo CD will be accessible at:
-
-```
-https://<YOUR_EC2_PUBLIC_IP>:<NODEPORT>
-```
-
-Find the exact NodePort with:
-
-```bash
-kubectl -n argocd get svc argocd-server
-```
-
-3. **Log in to Argo CD UI**
-
-```bash
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
-```
-
-- Username: `admin`
-- Password: (use command above)
-
-4. **Monitor GitOps Apps**
-
-- `ingress-nginx` and `kube-prometheus-stack` will be installed automatically.
-- View sync status and health in Argo CD UI.
-
-## 📁 Directory Structure
-
-```bash
-terraform/                  # Manages namespaces
-k8s/
-├── base/                   # Namespace definitions
-├── argocd/                 # Argo CD install + app-of-apps
-└── apps/                   # Helm-based apps deployed by Argo CD
-scripts/
-└── setup_with_nodeport.sh  # Automated setup script
-```
-
-## 🧪 Optional Tests
-
-To verify everything is up:
-
-```bash
-kubectl get pods -A
-kubectl -n monitoring port-forward svc/kube-prom-stack-grafana 3000:80 &
-```
-
-Then open `http://localhost:3000` (user: admin, pass: prom-operator)
+<sub>Generated 2025-05-10T07:03:11 UTC</sub>
 
 ---
 
-Happy GitOps-ing! 🚀
+## Quick Start (Recommended)
+
+```bash
+cd terraform
+terraform init
+terraform apply -var="kubeconfig_path=$HOME/.kube/config"
+```
+
+Terraform will:
+
+1. Create namespaces `argocd`, `monitoring`, `ingress-nginx`
+2. Install Argo CD, Ingress‑NGINX, and kube‑prometheus‑stack via Helm
+3. Output the *initial* Argo CD admin password (sensitive)
+
+> **Security:** After first login, change the default admin password  
+> *(Settings → Accounts → admin → Change password).*
+
+---
+
+## Local Demo (kubectl)
+
+```bash
+./setup.sh
+```
+
+This uses plain manifests under `k8s/`.
+
+---
+
+## Repo Layout
+
+| Path | Purpose |
+|------|---------|
+| `setup.sh` | Local demo bootstrap script |
+| `terraform/` | Helm‑based IaC |
+| `k8s/` | Manifests consumed by Argo CD |
+| `docs/` | Extra docs |
+
+---
+
+📖 Need detail? See [`docs/FILE_OVERVIEW.md`](docs/FILE_OVERVIEW.md)
