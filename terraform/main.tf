@@ -4,7 +4,7 @@ terraform {
   required_providers {
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.18.0"
+      version = "2.17.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
@@ -47,7 +47,6 @@ resource "helm_release" "argocd" {
   chart      = "argo-cd"
   version    = "6.7.3"
   namespace  = kubernetes_namespace.argocd.metadata[0].name
-  include_crds = true
   values     = [file("${path.module}/values/argocd-values.yaml")]
 }
 
@@ -66,7 +65,6 @@ resource "helm_release" "kps" {
   chart      = "kube-prometheus-stack"
   version    = "58.2.2"
   namespace  = kubernetes_namespace.monitoring.metadata[0].name
-  include_crds = true
   values     = [file("${path.module}/values/kps-values.yaml")]
 }
 
