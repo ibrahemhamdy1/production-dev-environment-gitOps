@@ -1,0 +1,17 @@
+# This lightweight stub references the official Argo CD manifest.
+# For offline clusters, download the manifest and embed it here.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-install-reference
+  namespace: argocd
+data:
+  README: |
+    Fetch the full install manifest:
+    curl -sSL -o argocd-install.yaml \
+      https://raw.githubusercontent.com/argoproj/argo-cd/v2.11.1/manifests/install.yaml
