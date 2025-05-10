@@ -3,16 +3,19 @@
 set -euo pipefail
 
 # ---- Requirements --------------------------------------------------------
-for bin in kubectl helm terraform kind; do
+# ---- Requirements --------------------------------------------------------
+NEEDED=(kubectl helm terraform)
+if [[ -z "${SKIP_KIND:-}" ]]; then
+  NEEDED+=(kind)
+fi
+
+for bin in "${NEEDED[@]}"; do
   if ! command -v "$bin" &>/dev/null; then
     echo "❌ Required binary '$bin' is not installed or not in PATH." >&2
     exit 1
   fi
 done
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export KUBECONFIG="${KUBECONFIG:-$HOME/.kube/config}"
-CLUSTER_NAME="${CLUSTER_NAME:-dev-env}"
 
 # ---- Create / reuse kind cluster ----------------------------------------
 if ! kind get clusters | grep -q "^${CLUSTER_NAME}$"; then
