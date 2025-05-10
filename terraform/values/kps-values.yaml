@@ -1,2 +1,1 @@
-grafana:
-  adminPassword: prom-operator
+# Kube Prometheus Stack values override

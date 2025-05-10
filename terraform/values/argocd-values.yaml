@@ -1,5 +1,1 @@
-server:
-  service:
-    type: ClusterIP
-  ingress:
-    enabled: false
+# Argo CD Helm values override

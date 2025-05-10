@@ -1,25 +1,47 @@
+
 terraform {
-  required_version = ">=1.4.0"
+  required_version = ">= 1.4.0"
   required_providers {
     kubernetes = { source = "hashicorp/kubernetes", version = "~> 2.27" }
     helm       = { source = "hashicorp/helm",       version = "~> 2.13" }
   }
 }
 
-provider "kubernetes" { config_path = var.kubeconfig_path }
-provider "helm" { kubernetes { config_path = var.kubeconfig_path } }
+provider "kubernetes" {
+  config_path = var.kubeconfig_path
+}
 
-resource "kubernetes_namespace" "argocd"  { metadata { name = "argocd" } }
-resource "kubernetes_namespace" "ingress" { metadata { name = "ingress-nginx" } }
-resource "kubernetes_namespace" "mon"     { metadata { name = "monitoring" } }
+provider "helm" {
+  kubernetes {
+    config_path = var.kubeconfig_path
+  }
+}
+
+resource "kubernetes_namespace" "argocd" {
+  metadata {
+    name = "argocd"
+  }
+}
+
+resource "kubernetes_namespace" "monitoring" {
+  metadata {
+    name = "monitoring"
+  }
+}
+
+resource "kubernetes_namespace" "ingress" {
+  metadata {
+    name = "ingress-nginx"
+  }
+}
 
 resource "helm_release" "argocd" {
   name       = "argocd"
   repository = "https://argoproj.github.io/argo-helm"
   chart      = "argo-cd"
   version    = "6.7.3"
-  include_crds = true
   namespace  = kubernetes_namespace.argocd.metadata[0].name
+  include_crds = true
   values     = [file("${path.module}/values/argocd-values.yaml")]
 }
 
@@ -37,12 +59,12 @@ resource "helm_release" "kps" {
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
   version    = "58.2.2"
+  namespace  = kubernetes_namespace.monitoring.metadata[0].name
   include_crds = true
-  namespace  = kubernetes_namespace.mon.metadata[0].name
   values     = [file("${path.module}/values/kps-values.yaml")]
 }
 
-data "kubernetes_secret" "pwd" {
+data "kubernetes_secret" "argopwd" {
   metadata {
     name      = "argocd-initial-admin-secret"
     namespace = kubernetes_namespace.argocd.metadata[0].name
@@ -50,6 +72,6 @@ data "kubernetes_secret" "pwd" {
 }
 
 output "argocd_admin_password" {
-  value       = base64decode(data.kubernetes_secret.pwd.data["password"])
+  value       = base64decode(data.kubernetes_secret.argopwd.data["password"])
   sensitive   = true
 }
