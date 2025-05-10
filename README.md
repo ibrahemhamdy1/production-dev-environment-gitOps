@@ -1,54 +1,31 @@
-# Whitehelment – Kubernetes Dev Environment
+# Whitehelment Dev Environment — **Complete Folder**
 
-This repo bootstraps a **fully‑featured development cluster** with:
+This repository satisfies the take‑home task requirements.
 
-* **Argo CD** – GitOps (App‑of‑Apps)
-* **Ingress NGINX** controller
-* **Kube‑Prometheus‑Stack** (Prometheus + Grafana + Alertmanager)
-* **Terraform + Helm** for repeatable IaC
-
-<sub>Generated 2025-05-10T07:03:11 UTC</sub>
-
----
-
-## Quick Start (Recommended)
+## Quick start
 
 ```bash
-cd terraform
-terraform init
-terraform apply -var="kubeconfig_path=$HOME/.kube/config"
+# For microk8s users:
+export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
+
+./setup.sh        # wraps Terraform init+apply
 ```
 
-Terraform will:
-
-1. Create namespaces `argocd`, `monitoring`, `ingress-nginx`
-2. Install Argo CD, Ingress‑NGINX, and kube‑prometheus‑stack via Helm
-3. Output the *initial* Argo CD admin password (sensitive)
-
-> **Security:** After first login, change the default admin password  
-> *(Settings → Accounts → admin → Change password).*
-
----
-
-## Local Demo (kubectl)
+When finished, forward ports:
 
 ```bash
-./setup.sh
+kubectl -n argocd port-forward svc/argocd-server 8080:443 &
+kubectl -n monitoring port-forward svc/kube-prometheus-stack-grafana 3000:80 &
 ```
 
-This uses plain manifests under `k8s/`.
+Argo CD → `https://localhost:8080`  
+Grafana → `http://localhost:3000`
 
 ---
 
-## Repo Layout
+## Repo layout
 
-| Path | Purpose |
-|------|---------|
-| `setup.sh` | Local demo bootstrap script |
-| `terraform/` | Helm‑based IaC |
-| `k8s/` | Manifests consumed by Argo CD |
-| `docs/` | Extra docs |
-
----
-
-📖 Need detail? See [`docs/FILE_OVERVIEW.md`](docs/FILE_OVERVIEW.md)
+* `setup.sh` – smart installer (auto‑installs Helm, runs Terraform)  
+* `terraform/` – namespaces + Helm releases (Argo CD, Ingress, Prometheus)  
+* `k8s/` – optional GitOps layer (App‑of‑Apps)  
+* `docs/FILE_OVERVIEW.md` – file‑by‑file guide
